@@ -7,14 +7,17 @@ import gl "vendor:OpenGL"
 g_window_handle: glfw.WindowHandle
 
 @(export)
-window_init :: proc(width, height: int, title: string) {
+window_init :: proc(width, height: int, title: string, allocator := context.allocator) {
+	context.allocator = allocator
 	glfw.WindowHint(glfw.CLIENT_API, 0)
 	glfw.WindowHint(glfw.RESIZABLE, false)
 
-	assert(bool(glfw.Init()))
+	assert(glfw.Init() == true)
 	titlen := str.clone_to_cstring(title)
 	g_window_handle = glfw.CreateWindow(i32(width), i32(height), titlen, nil, nil)
 	glfw.MakeContextCurrent(g_window_handle)
+
+	vulkan_init(title)
 }
 
 @(export)
