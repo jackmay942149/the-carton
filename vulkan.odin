@@ -11,6 +11,7 @@ Vulkan_Ctx :: struct {
 
 g_vk_ctx: Vulkan_Ctx
 
+@(private)
 vulkan_init :: proc(project_name: string) {
 	vk.load_proc_addresses_global(rawptr(glfw.GetInstanceProcAddress))
 	project_name_n := str.clone_to_cstring(project_name, context.allocator)
@@ -35,6 +36,7 @@ vulkan_init :: proc(project_name: string) {
 	vk.load_proc_addresses_instance(g_vk_ctx.instance)
 }
 
+@(private="file")
 vk_assert :: proc(res: vk.Result, message: string) {
 	if res != .SUCCESS {
 		fmt.println(res)
