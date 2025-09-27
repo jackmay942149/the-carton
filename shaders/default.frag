@@ -1,6 +1,12 @@
 #version 330 core
+
+in vec3 passColour;
+in vec2 passCoord;
+
+uniform sampler2D text;
+
 out vec4 FragColor;
 
 void main() {
-  FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+  FragColor = texture(text, passCoord);
 } 
