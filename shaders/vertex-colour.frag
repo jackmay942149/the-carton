@@ -1,9 +1,9 @@
 #version 330 core
 
-in vec3 passColour;
+in vec3 pass_colour;
 
-out vec4 FragColor;
+out vec4 out_colour;
 
 void main() {
-  FragColor = vec4(passColour, 1.0f);
+  out_colour = vec4(pass_colour, 1.0f);
 } 

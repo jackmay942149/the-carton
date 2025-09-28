@@ -10,8 +10,8 @@ should_close_window :: proc() -> bool {
 	return window_should_close()
 }
 
-update_window :: proc(mesh: ^Mesh) {
-	window_update(mesh)
+update_window :: proc(entity: ^Entity) {
+	window_update(entity)
 }
 
 destroy_window :: proc() {
@@ -19,6 +19,6 @@ destroy_window :: proc() {
 }
 
 @(require_results)
-register_mesh :: proc() -> Mesh {
-	return mesh_register()
+register_mesh :: proc(path: cstring) -> Mesh {
+	return mesh_register(path)
 }

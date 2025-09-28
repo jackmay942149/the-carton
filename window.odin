@@ -41,9 +41,9 @@ window_should_close :: proc() -> bool {
 }
 
 @(private)
-window_update :: proc(mesh: ^Mesh) {
+window_update :: proc(entity: ^Entity) {
 	#partial switch g_graphics_api {
-		case .OpenGL: opengl_update(mesh)
+		case .OpenGL: opengl_update(entity)
 	}
 	glfw.SwapBuffers(g_window_handle)
 	glfw.PollEvents()
