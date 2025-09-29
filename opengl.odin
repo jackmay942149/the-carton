@@ -21,19 +21,17 @@ opengl_update :: proc(entity: ^Entity) {
 
 	transform := gl.GetUniformLocation(entity.mesh.material.shader, "uni_transform")
 	model_mat := la.identity(matrix[4, 4]f32)
-	model_mat = la.matrix4_rotate(entity.rotation, [3]f32{1, 0, 0}) * model_mat
-	model_mat = la.matrix4_translate(entity.position) * model_mat
+	model_mat = la.matrix4_rotate(entity.rotation, [3]f32{0, 0, 1}) * model_mat
 
 	view_mat := la.identity(matrix[4, 4]f32)
-	view_mat = la.matrix4_translate([3]f32{0, 0, -3}) * view_mat
+	view_mat = la.matrix4_translate([3]f32{0, 0, -100}) * view_mat
 
 	projection_mat := la.identity(matrix[4, 4]f32)
-	projection_mat = la.matrix4_perspective(f32(la.to_radians(45.0)), 800/680, 0.1, 100)
+	projection_mat = la.matrix4_perspective(f32(la.to_radians(45.0)), 800/680, 0.1, 1000)
 
 	transform_mat := projection_mat * view_mat * model_mat
-	identity := la.identity_matrix(matrix[4, 4]f32) * la.matrix4_translate_f32({0.1, 0.1, 0})
 	gl.UniformMatrix4fv(transform, 1, false, raw_data(&transform_mat))
 	gl.DrawElements(gl.TRIANGLES, i32(len(entity.mesh.indices)), gl.UNSIGNED_INT, nil)
 
-	entity.rotation += 0.001
+	entity.rotation += 0.0001
 }
