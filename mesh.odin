@@ -22,10 +22,12 @@ T_Mesh :: struct {
 	total_index: uint,
 	buffer_size: uint,
 	postions: [][3]f64,
+	coords: [][2]f64,
 	buffer: []u32,
 }
 
 T_Mesh_Part :: struct {
+	node_ptr: ^fbx.Node,
 	mesh_ptr: ^fbx.Mesh,
 	vertex_count: uint,
 	index_count: uint,
@@ -54,6 +56,7 @@ mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
 	for i in 0..<scene.nodes.count {
 		if scene.nodes.data[i].mesh != nil {
 			mesh_parts[offset].mesh_ptr = scene.nodes.data[i].mesh
+			mesh_parts[offset].node_ptr = scene.nodes.data[i]
 			offset += 1
 		}
 	}
@@ -70,10 +73,12 @@ mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
 	}
 
 	positions := make([][3]f64, t_mesh.total_vertex)
+	coords := make([][2]f64, t_mesh.total_vertex)
 	offset = 0
 	for part in mesh_parts {
 		for i in 0..<part.vertex_count {
-			positions[offset + int(i)] = part.mesh_ptr.vertex_position.values.data[i]
+			positions[offset + int(i)] = fbx.transform_position(&part.node_ptr.geometry_to_world, part.mesh_ptr.vertex_position.values.data[i]) 
+			coords[offset + int(i)] = part.mesh_ptr.vertex_uv.values.data[i]
 		}
 		offset += int(part.vertex_count)
 	}
@@ -96,54 +101,10 @@ mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
 		index_offset = 0
 	}
 
-	// index_count: uint = 0
-	// vertex_count: uint = 0
-	// for i in 0..<scene.nodes.count {
-	// 	node := scene.nodes.data[i]
-	// 	log.info(scene.nodes.data[i].element.name)
-	// 	if node.mesh != nil {
-	// 		index_count += node.mesh.num_indices
-	// 		vertex_count += node.mesh.num_indices
-	// 	}
-	// }
-	// log.info(index_count, vertex_count)
- //  indices := make([]u32, 100000)
- //  vertices := make([]Vertex, vertex_count)
-
- //  // index_offset: u32 = 0
- //  // vertex_offset: u32 = 0
-	// fbx_mesh: ^fbx.Mesh
-	// for i in 0..<scene.nodes.count {
-	// 	node := scene.nodes.data[i]
-	// 	if node.is_root || node.mesh == nil {continue}
-	// 	fbx_mesh = node.mesh
-	// 	log.info(node.element.name)
-
-	// 	index_count_part: u32 = 3 * u32(fbx_mesh.num_triangles)
-	//   for i in 0 ..< fbx_mesh.faces.count {
-	//     face := fbx_mesh.faces.data[i]
-	//     tris := fbx.catch_triangulate_face(nil, &indices[index_offset], uint(index_count_part), fbx_mesh, face)
-	//     index_offset += 3 * int(tris)
-	//   }
-
-	//   vertex_count_part: u32 = u32(fbx_mesh.num_indices)
-	//   for i in 0..< vertex_count_part {
-	//     pos := fbx_mesh.vertex_position.values.data[fbx_mesh.vertex_position.indices.data[i]]
-	//     pos *= node.local_transform.scale
-	//     pos += node.local_transform.translation
-	//     uv := fbx_mesh.vertex_uv.values.data[fbx_mesh.vertex_uv.indices.data[i]]
-	//     vertices[u32(i)+vertex_offset].position = {f32(pos.x), f32(pos.y), f32(pos.z)}
-	//     vertices[u32(i)+vertex_offset].colour = {0, 0, 0}
-	//     vertices[u32(i)+vertex_offset].coords = {f32(uv.x), f32(uv.y)}
-	//   }
-	//   vertex_offset += vertex_count_part
-	//   index_offset += int(index_count_part)
-	// }
- //  fbx.free_scene(scene)
-
   vertices := make([]Vertex, t_mesh.total_vertex)
   for i in 0..<len(vertices) {
   	vertices[i].position = {f32(positions[i].x), f32(positions[i].y), f32(positions[i].z)}
+  	vertices[i].coords = {f32(coords[i].x), f32(coords[i].y)}
   }
 	mesh.vertices = vertices
 	mesh.indices = buffer

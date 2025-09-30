@@ -8,5 +8,5 @@ uniform sampler2D uni_texture;
 out vec4 out_colour;
 
 void main() {
-  out_colour = texture(uni_texture, pass_coord) + vec4(pass_colour, 0.0f);
+  out_colour = texture(uni_texture, pass_coord);
 } 
