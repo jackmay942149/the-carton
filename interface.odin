@@ -19,8 +19,17 @@ destroy_window :: proc() {
 }
 
 @(require_results)
-register_mesh :: proc(path: cstring) -> Mesh {
+register_mesh_cstring :: proc(path: cstring) -> Mesh {
 	return mesh_register(path)
+}
+@(require_results)
+register_mesh_bytes :: proc(file: []u8) -> Mesh {
+	return mesh_register(file)
+}
+@(require_results)
+register_mesh :: proc {
+	register_mesh_bytes,
+	register_mesh_cstring,
 }
 
 @(require_results)
@@ -29,8 +38,17 @@ register_shader :: proc(vert, frag: string) -> Shader {
 }
 
 @(require_results)
-register_texture :: proc(path: cstring) -> Texture {
+register_texture_cstring :: proc(path: cstring) -> Texture {
 	return texture_register(path)
+}
+@(require_results)
+register_texture_bytes :: proc(file: []u8) -> Texture {
+	return texture_register(file)
+}
+@(require_results)
+register_texture :: proc {
+	register_texture_bytes,
+	register_texture_cstring,
 }
 
 attach_shader_to_material :: proc(material: ^Material, shader_id: Shader) {

@@ -33,16 +33,50 @@ Mesh_Loader_Part :: struct {
 	buffer_size: uint,
 }
 
-@(private)
-mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
+@(private = "file")
+open_scene_from_path :: proc(path: cstring) -> (scene: ^fbx.Scene) {
 	opts: fbx.Load_Opts
 	opts.target_unit_meters = 0.01
 	err: fbx.Error
-	scene := fbx.load_file(path, &opts, &err)
+	scene = fbx.load_file(path, &opts, &err)
 	if scene == nil {
 		log.fatal(err)
 	}
+	return scene
+}
 
+@(private = "file")
+open_scene_from_bytes :: proc(file: []u8) -> (scene: ^fbx.Scene) {
+	opts: fbx.Load_Opts
+	opts.target_unit_meters = 0.01
+	err: fbx.Error
+	scene = fbx.load_memory(&file[0], len(file), &opts, &err)
+	if scene == nil {
+		log.fatal(err)
+	}
+	return scene
+}
+
+@(private)
+mesh_register_runtime :: proc(path: cstring) -> (mesh: Mesh) {
+	scene := open_scene_from_path(path)
+	return process_scene(scene)
+}
+
+@(private)
+mesh_register_comptime :: proc(file: []u8) -> (mesh: Mesh) {
+	scene := open_scene_from_bytes(file)
+	return process_scene(scene)
+}
+
+@(private)
+mesh_register :: proc{
+	mesh_register_comptime,
+	mesh_register_runtime,
+}
+
+@(private = "file")
+process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
 	mesh_part_count := 0
 	for i in 0..<scene.nodes.count {
 		if scene.nodes.data[i].mesh != nil {
