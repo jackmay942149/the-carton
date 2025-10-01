@@ -3,7 +3,6 @@ package engine
 import log  "core:log"
 import mem  "core:mem"
 import gl   "vendor:OpenGL"
-import stbi "vendor:stb/image"
 import la   "core:math/linalg"
 import fbx  "./dependencies/ufbx"
 
@@ -16,8 +15,8 @@ Mesh :: struct {
 	material: Material,
 }
 
-T_Mesh :: struct {
-	parts: []T_Mesh_Part,
+Mesh_Loader :: struct {
+	parts: []Mesh_Loader_Part,
 	total_vertex: uint,
 	total_index: uint,
 	buffer_size: uint,
@@ -26,7 +25,7 @@ T_Mesh :: struct {
 	buffer: []u32,
 }
 
-T_Mesh_Part :: struct {
+Mesh_Loader_Part :: struct {
 	node_ptr: ^fbx.Node,
 	mesh_ptr: ^fbx.Mesh,
 	vertex_count: uint,
@@ -51,7 +50,7 @@ mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
 		}
 	}
 
-	mesh_parts := make([]T_Mesh_Part, mesh_part_count)
+	mesh_parts := make([]Mesh_Loader_Part, mesh_part_count)
 	offset := 0
 	for i in 0..<scene.nodes.count {
 		if scene.nodes.data[i].mesh != nil {
@@ -61,7 +60,7 @@ mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
 		}
 	}
 
-	t_mesh: T_Mesh
+	t_mesh: Mesh_Loader
 	t_mesh.parts = mesh_parts[:]
 	for &part in mesh_parts {
 		part.vertex_count = part.mesh_ptr.num_vertices
@@ -109,13 +108,6 @@ mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
 	mesh.vertices = vertices
 	mesh.indices = buffer
 
-	ok: bool
-	mesh.material.shader, ok = gl.load_shaders_file("../the-carton/shaders/default.vert", "../the-carton/shaders/default.frag")
-	if !ok {
-		log.error("Failed to load shaders")
-	}
-	gl.UseProgram(mesh.material.shader)
-
 	gl.GenVertexArrays(1, &mesh.vao)
 	gl.BindVertexArray(mesh.vao)
 
@@ -133,23 +125,6 @@ mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
 	gl.EnableVertexAttribArray(1)
 	gl.VertexAttribPointer(2, 2, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, coords))
 	gl.EnableVertexAttribArray(2)
-
-
-	gl.GenTextures(1, &mesh.material.texture)
-	gl.BindTexture(gl.TEXTURE_2D, mesh.material.texture)
-	gl.TextureParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
-	gl.TextureParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
-	gl.TextureParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-	gl.TextureParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-
-	width, height, channel_count: i32
-	data := stbi.load("../the-carton/textures/wall.jpg", &width, &height, &channel_count, 0)
-	if data != nil {
-		gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, data)
-		gl.GenerateMipmap(gl.TEXTURE_2D)
-	} else {
-		log.error(stbi.failure_reason())
-	}
 
 	return mesh
 }

@@ -22,3 +22,21 @@ destroy_window :: proc() {
 register_mesh :: proc(path: cstring) -> Mesh {
 	return mesh_register(path)
 }
+
+@(require_results)
+register_shader :: proc(vert, frag: string) -> Shader {
+	return shader_register(vert, frag)
+}
+
+@(require_results)
+register_texture :: proc(path: cstring) -> Texture {
+	return texture_register(path)
+}
+
+attach_shader_to_material :: proc(material: ^Material, shader_id: Shader) {
+	material_attach_shader(material, shader_id)
+}
+
+attach_texture_to_material :: proc(material: ^Material, texture_id: Texture) {
+	material_attach_texture(material, texture_id)
+}
