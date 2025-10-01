@@ -110,7 +110,7 @@ mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
 	mesh.indices = buffer
 
 	ok: bool
-	mesh.material.shader, ok = gl.load_shaders_file("../engine/shaders/default.vert", "../engine/shaders/default.frag")
+	mesh.material.shader, ok = gl.load_shaders_file("../the-carton/shaders/default.vert", "../the-carton/shaders/default.frag")
 	if !ok {
 		log.error("Failed to load shaders")
 	}
@@ -143,7 +143,7 @@ mesh_register :: proc(path: cstring) -> (mesh: Mesh) {
 	gl.TextureParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 
 	width, height, channel_count: i32
-	data := stbi.load("../engine/textures/wall.jpg", &width, &height, &channel_count, 0)
+	data := stbi.load("../the-carton/textures/wall.jpg", &width, &height, &channel_count, 0)
 	if data != nil {
 		gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, data)
 		gl.GenerateMipmap(gl.TEXTURE_2D)
