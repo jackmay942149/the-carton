@@ -10,8 +10,8 @@ should_close_window :: proc() -> bool {
 	return window_should_close()
 }
 
-update_window :: proc(entity: ^Entity) {
-	window_update(entity)
+update_window :: proc(scene: ^Scene) {
+	window_update(scene)
 }
 
 destroy_window :: proc() {

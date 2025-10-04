@@ -36,6 +36,7 @@ texture_register_comptime :: proc(file: []u8) -> (texture_id: Texture) {
 	gl.TextureParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 
 	width, height, channel_count: i32
+	stbi.set_flip_vertically_on_load(1)
 	data := stbi.load_from_memory(raw_data(file), i32(len(file)), &width, &height, &channel_count, 0)
 	if data != nil {
 		gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, data)

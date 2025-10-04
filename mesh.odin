@@ -105,15 +105,15 @@ process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
 		t_mesh.buffer_size += part.buffer_size
 	}
 
-	positions := make([][3]f64, t_mesh.total_vertex)
-	coords := make([][2]f64, t_mesh.total_vertex)
+	positions := make([][3]f64, t_mesh.total_index)
+	coords := make([][2]f64, t_mesh.total_index)
 	offset = 0
 	for part in mesh_parts {
-		for i in 0..<part.vertex_count {
-			positions[offset + int(i)] = fbx.transform_position(&part.node_ptr.geometry_to_world, part.mesh_ptr.vertex_position.values.data[i]) 
-			coords[offset + int(i)] = part.mesh_ptr.vertex_uv.values.data[i]
+		for i in 0..<part.index_count {
+			positions[offset + int(i)] = fbx.transform_position(&part.node_ptr.geometry_to_world, part.mesh_ptr.vertex_position.values.data[part.mesh_ptr.vertex_position.indices.data[i]]) 
+			coords[offset + int(i)] = part.mesh_ptr.vertex_uv.values.data[part.mesh_ptr.vertex_uv.indices.data[i]]
 		}
-		offset += int(part.vertex_count)
+		offset += int(part.index_count)
 	}
 
 	buffer := make([]u32, t_mesh.buffer_size)
@@ -127,17 +127,18 @@ process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
 	    index_offset += 3 * int(tris)
 		}
 		for i in offset..<offset + int(part.buffer_size) {
-			buffer[i] = part.mesh_ptr.vertex_indices.data[buffer[i]] + vertex_offset
+			buffer[i] = buffer[i] + vertex_offset
 		}
-		vertex_offset += u32(part.vertex_count)
+		vertex_offset += u32(part.index_count)
 		offset += int(part.buffer_size)
 		index_offset = 0
 	}
 
-  vertices := make([]Vertex, t_mesh.total_vertex)
+  vertices := make([]Vertex, t_mesh.total_index)
   for i in 0..<len(vertices) {
   	vertices[i].position = {f32(positions[i].x), f32(positions[i].y), f32(positions[i].z)}
   	vertices[i].coords = {f32(coords[i].x), f32(coords[i].y)}
+  	// vertices[i].coords = {f32(coords[i].x), f32(coords[i].y)}
   }
 	mesh.vertices = vertices
 	mesh.indices = buffer

@@ -13,29 +13,34 @@ opengl_init :: proc() {
 }
 
 @(private)
-opengl_update :: proc(entity: ^Entity) {
+opengl_update :: proc(scene: ^Scene) {
+	assert(scene != nil)
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	gl.UseProgram(entity.mesh.material.shader)
-	gl.BindTexture(gl.TEXTURE_2D, entity.mesh.material.texture)
-	gl.BindVertexArray(entity.mesh.vao)
-
-	model := gl.GetUniformLocation(entity.mesh.material.shader, "uni_model")
-	view := gl.GetUniformLocation(entity.mesh.material.shader, "uni_view")
-	projection := gl.GetUniformLocation(entity.mesh.material.shader, "uni_projection")
-
-	model_mat := la.identity(matrix[4, 4]f32)
-	model_mat = la.matrix4_rotate(entity.rotation, [3]f32{0, 1, 0}) * model_mat
-	model_mat = la.matrix4_translate(entity.position) * model_mat
 
 	view_mat := la.identity(matrix[4, 4]f32)
-	view_mat = la.matrix4_rotate_f32(la.to_radians(f32(90)), {1, 0, 0}) * view_mat
+	view_mat = la.matrix4_rotate_f32(la.to_radians(f32(scene.camera.look_at_rotator.y)), {1, 0, 0}) * view_mat
+	view_mat = la.matrix4_rotate_f32(la.to_radians(f32(scene.camera.look_at_rotator.x)), {0, 1, 0}) * view_mat
 	view_mat = la.matrix4_translate([3]f32{0, 0, -100}) * view_mat
+	
+	for entity in scene.entities {
+		gl.UseProgram(entity.mesh.material.shader)
+		gl.BindTexture(gl.TEXTURE_2D, entity.mesh.material.texture)
+		gl.BindVertexArray(entity.mesh.vao)
 
-	projection_mat := la.matrix4_perspective(f32(la.to_radians(45.0)), 1600.0/900.0, 0.1, 100)
+		model := gl.GetUniformLocation(entity.mesh.material.shader, "uni_model")
+		view := gl.GetUniformLocation(entity.mesh.material.shader, "uni_view")
+		projection := gl.GetUniformLocation(entity.mesh.material.shader, "uni_projection")
 
-	gl.UniformMatrix4fv(model, 1, false, raw_data(&model_mat))
-	gl.UniformMatrix4fv(view, 1, false, raw_data(&view_mat))
-	gl.UniformMatrix4fv(projection, 1, false, raw_data(&projection_mat))
-	gl.DrawElements(gl.TRIANGLES, i32(len(entity.mesh.indices)), gl.UNSIGNED_INT, nil)
+		model_mat := la.identity(matrix[4, 4]f32)
+		model_mat = la.matrix4_rotate(entity.rotation, [3]f32{0, 1, 0}) * model_mat
+		model_mat = la.matrix4_translate(entity.position) * model_mat
+
+		projection_mat := la.matrix4_perspective(f32(la.to_radians(45.0)), 1600.0/900.0, 0.1, 1000)
+
+		gl.UniformMatrix4fv(model, 1, false, raw_data(&model_mat))
+		gl.UniformMatrix4fv(view, 1, false, raw_data(&view_mat))
+		gl.UniformMatrix4fv(projection, 1, false, raw_data(&projection_mat))
+		gl.DrawElements(gl.TRIANGLES, i32(len(entity.mesh.indices)), gl.UNSIGNED_INT, nil)
+	}
 
 }
