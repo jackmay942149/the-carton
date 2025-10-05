@@ -16,27 +16,28 @@ Mesh :: struct {
 }
 
 Mesh_Loader :: struct {
-	parts: []Mesh_Loader_Part,
+	parts:        []Mesh_Loader_Part,
 	total_vertex: uint,
-	total_index: uint,
-	buffer_size: uint,
-	postions: [][3]f64,
-	coords: [][2]f64,
-	buffer: []u32,
+	total_index:  uint,
+	buffer_size:  uint,
+	postions:     [][3]f64,
+	coords:       [][2]f64,
+	buffer:       []u32,
 }
 
 Mesh_Loader_Part :: struct {
-	node_ptr: ^fbx.Node,
-	mesh_ptr: ^fbx.Mesh,
+	node_ptr:     ^fbx.Node,
+	mesh_ptr:     ^fbx.Mesh,
 	vertex_count: uint,
-	index_count: uint,
-	buffer_size: uint,
+	index_count:  uint,
+	buffer_size:  uint,
 }
 
 @(private = "file")
 open_scene_from_path :: proc(path: cstring) -> (scene: ^fbx.Scene) {
 	opts: fbx.Load_Opts
 	opts.target_unit_meters = 0.01
+	opts.generate_missing_normals = true
 	err: fbx.Error
 	scene = fbx.load_file(path, &opts, &err)
 	if scene == nil {
@@ -49,6 +50,7 @@ open_scene_from_path :: proc(path: cstring) -> (scene: ^fbx.Scene) {
 open_scene_from_bytes :: proc(file: []u8) -> (scene: ^fbx.Scene) {
 	opts: fbx.Load_Opts
 	opts.target_unit_meters = 0.01
+	opts.generate_missing_normals = true
 	err: fbx.Error
 	scene = fbx.load_memory(&file[0], len(file), &opts, &err)
 	if scene == nil {
@@ -107,11 +109,14 @@ process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
 
 	positions := make([][3]f64, t_mesh.total_index)
 	coords := make([][2]f64, t_mesh.total_index)
+	normals := make([][3]f64, t_mesh.total_index)
+
 	offset = 0
 	for part in mesh_parts {
 		for i in 0..<part.index_count {
 			positions[offset + int(i)] = fbx.transform_position(&part.node_ptr.geometry_to_world, part.mesh_ptr.vertex_position.values.data[part.mesh_ptr.vertex_position.indices.data[i]]) 
 			coords[offset + int(i)] = part.mesh_ptr.vertex_uv.values.data[part.mesh_ptr.vertex_uv.indices.data[i]]
+			normals[offset + int(i)] = part.mesh_ptr.vertex_normal.values.data[part.mesh_ptr.vertex_normal.indices.data[i]]
 		}
 		offset += int(part.index_count)
 	}
@@ -138,7 +143,7 @@ process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
   for i in 0..<len(vertices) {
   	vertices[i].position = {f32(positions[i].x), f32(positions[i].y), f32(positions[i].z)}
   	vertices[i].coords = {f32(coords[i].x), f32(coords[i].y)}
-  	// vertices[i].coords = {f32(coords[i].x), f32(coords[i].y)}
+  	vertices[i].normal = {f32(normals[i].x), f32(normals[i].y), f32(normals[i].z)}
   }
 	mesh.vertices = vertices
 	mesh.indices = buffer
@@ -160,6 +165,8 @@ process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
 	gl.EnableVertexAttribArray(1)
 	gl.VertexAttribPointer(2, 2, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, coords))
 	gl.EnableVertexAttribArray(2)
+	gl.VertexAttribPointer(3, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, normal))
+	gl.EnableVertexAttribArray(3)
 
 	return mesh
 }
