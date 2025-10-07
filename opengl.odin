@@ -30,6 +30,7 @@ opengl_update :: proc(scene: ^Scene) {
 		model := gl.GetUniformLocation(entity.mesh.material.shader, "uni_model")
 		view := gl.GetUniformLocation(entity.mesh.material.shader, "uni_view")
 		projection := gl.GetUniformLocation(entity.mesh.material.shader, "uni_projection")
+		bad_uniform := gl.GetUniformLocation(entity.mesh.material.shader, "bad_uni")
 
 		model_mat := la.identity(matrix[4, 4]f32)
 		model_mat = la.matrix4_rotate(entity.rotation, [3]f32{0, 1, 0}) * model_mat
