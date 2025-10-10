@@ -55,8 +55,8 @@ window_update :: proc(scene: ^Scene) {
 	mouse_pos_x, mouse_pos_y := input_mouse_motion()
 
 	if input_is_key_down(.LEFT_ALT) && input_is_mouse_down(.LEFT) {
-		scene.camera.look_at_rotator.x -= f32(g_mouse_pos.x - mouse_pos_x)/5
-		scene.camera.look_at_rotator.y += f32(g_mouse_pos.y - mouse_pos_y)/5
+		scene.camera.look_at_rotator.y -= f32(g_mouse_pos.x - mouse_pos_x)/5
+		scene.camera.look_at_rotator.x -= f32(g_mouse_pos.y - mouse_pos_y)/5
 	}
 	g_mouse_pos = {mouse_pos_x, mouse_pos_y}
 }

@@ -13,6 +13,7 @@ Mesh :: struct {
 	vbo:      u32,
 	ebo:      u32,
 	material: Material,
+	needs_update: bool,
 }
 
 Mesh_Loader :: struct {
@@ -110,6 +111,7 @@ process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
 	positions := make([][3]f64, t_mesh.total_index)
 	coords := make([][2]f64, t_mesh.total_index)
 	normals := make([][3]f64, t_mesh.total_index)
+	colours := make([][3]f64, t_mesh.total_index)
 
 	offset = 0
 	for part in mesh_parts {
@@ -117,7 +119,12 @@ process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
 			positions[offset + int(i)] = fbx.transform_position(&part.node_ptr.geometry_to_world, part.mesh_ptr.vertex_position.values.data[part.mesh_ptr.vertex_position.indices.data[i]]) 
 			coords[offset + int(i)] = part.mesh_ptr.vertex_uv.values.data[part.mesh_ptr.vertex_uv.indices.data[i]]
 			normals[offset + int(i)] = part.mesh_ptr.vertex_normal.values.data[part.mesh_ptr.vertex_normal.indices.data[i]]
+			colours[offset + int(i)] = {1, 1, 1}
+			if positions[offset + int(i)].x < 0.1 && positions[offset + int(i)].x > -0.2 {
+				colours[offset + int(i)] = {0, 0, 0}
+			}
 		}
+
 		offset += int(part.index_count)
 	}
 
@@ -144,6 +151,7 @@ process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
   	vertices[i].position = {f32(positions[i].x), f32(positions[i].y), f32(positions[i].z)}
   	vertices[i].coords = {f32(coords[i].x), f32(coords[i].y)}
   	vertices[i].normal = {f32(normals[i].x), f32(normals[i].y), f32(normals[i].z)}
+  	vertices[i].colour = {f32(colours[i].x), f32(colours[i].y), f32(colours[i].z),}
   }
 	mesh.vertices = vertices
 	mesh.indices = buffer
@@ -153,7 +161,7 @@ process_scene :: proc(scene: ^fbx.Scene) -> (mesh: Mesh) {
 
 	gl.GenBuffers(1, &mesh.vbo)
 	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, len(mesh.vertices) * size_of(Vertex), &mesh.vertices[0], gl.STATIC_DRAW)
+	gl.BufferData(gl.ARRAY_BUFFER, len(mesh.vertices) * size_of(Vertex), &mesh.vertices[0], gl.DYNAMIC_DRAW)
 
 	gl.GenBuffers(1, &mesh.ebo)
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ebo)

@@ -58,3 +58,7 @@ attach_shader_to_material :: proc(material: ^Material, shader_id: Shader) {
 attach_texture_to_material :: proc(material: ^Material, texture_id: Texture) {
 	material_attach_texture(material, texture_id)
 }
+
+is_key_down :: proc(key: Key) -> bool {
+	return input_is_key_down(key)
+}

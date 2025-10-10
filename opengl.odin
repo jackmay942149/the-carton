@@ -17,20 +17,26 @@ opengl_update :: proc(scene: ^Scene) {
 	assert(scene != nil)
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	view_mat := la.identity(matrix[4, 4]f32)
-	view_mat = la.matrix4_rotate_f32(la.to_radians(f32(scene.camera.look_at_rotator.y)), {1, 0, 0}) * view_mat
-	view_mat = la.matrix4_rotate_f32(la.to_radians(f32(scene.camera.look_at_rotator.x)), {0, 1, 0}) * view_mat
-	view_mat = la.matrix4_translate([3]f32{0, 0, -100}) * view_mat
+	view_mat := camera_get_view_matrix(&scene.camera)
 	
-	for entity in scene.entities {
+	for &entity in scene.entities {
+		if entity.update != nil {
+			entity.update(&entity)
+		}
+
+		
 		gl.UseProgram(entity.mesh.material.shader)
 		gl.BindTexture(gl.TEXTURE_2D, entity.mesh.material.texture)
 		gl.BindVertexArray(entity.mesh.vao)
 
+		if entity.mesh.needs_update {
+			gl.BindBuffer(gl.ARRAY_BUFFER, entity.mesh.vbo)
+			gl.BufferData(gl.ARRAY_BUFFER, len(entity.mesh.vertices) * size_of(Vertex), &entity.mesh.vertices[0], gl.DYNAMIC_DRAW)
+		}
+
 		model := gl.GetUniformLocation(entity.mesh.material.shader, "uni_model")
 		view := gl.GetUniformLocation(entity.mesh.material.shader, "uni_view")
 		projection := gl.GetUniformLocation(entity.mesh.material.shader, "uni_projection")
-		bad_uniform := gl.GetUniformLocation(entity.mesh.material.shader, "bad_uni")
 
 		model_mat := la.identity(matrix[4, 4]f32)
 		model_mat = la.matrix4_rotate(entity.rotation, [3]f32{0, 1, 0}) * model_mat
