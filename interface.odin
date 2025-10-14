@@ -1,6 +1,6 @@
 package engine
 
-import log "core:log"
+import label "./the-label"
 
 init_window :: proc(width, height: int, title: string, api: Graphics_Api, allocator := context.allocator) {
 	window_init(width, height, title, api, allocator)
@@ -62,3 +62,9 @@ attach_texture_to_material :: proc(material: ^Material, texture_id: Texture) {
 is_key_down :: proc(key: Key) -> bool {
 	return input_is_key_down(key)
 }
+
+// the-label bindings
+update_label :: proc(path_label, path_key: string) {label.update_label(path_label, path_key)}
+load_label :: proc(path: string) -> label.KV_Label {return label.load_label(path)}
+get_label_value_string :: proc(key: string, label_to_check: label.KV_Label) -> (value: string, found: bool) {return label.get_value_string(key, label_to_check)}
+get_label_value_int :: proc(key: string, label_to_check: label.KV_Label) -> (value: int, found: bool) {return label.get_value_int(key, label_to_check)}
