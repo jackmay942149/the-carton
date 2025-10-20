@@ -6,4 +6,5 @@ Scene :: struct {
 	window: glfw.WindowHandle,
 	camera: Camera,
 	entities: []Entity,
+	ui: UI,
 }

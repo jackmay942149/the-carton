@@ -50,4 +50,12 @@ opengl_update :: proc(scene: ^Scene) {
 		gl.DrawElements(gl.TRIANGLES, i32(len(entity.mesh.indices)), gl.UNSIGNED_INT, nil)
 	}
 
+	if scene.ui.components != nil {
+		for component in scene.ui.components {
+			for &atom in component.elements {
+				atom.draw(&atom)
+			}
+		}
+	}
+
 }
