@@ -68,3 +68,4 @@ update_label :: proc(path_label, path_key: string) {label.update_label(path_labe
 load_label :: proc(path: string) -> label.KV_Label {return label.load_label(path)}
 get_label_value_string :: proc(key: string, label_to_check: label.KV_Label) -> (value: string, found: bool) {return label.get_value_string(key, label_to_check)}
 get_label_value_int :: proc(key: string, label_to_check: label.KV_Label) -> (value: int, found: bool) {return label.get_value_int(key, label_to_check)}
+get_label_value_f64 :: proc(key: string, label_to_check: label.KV_Label) -> (value: f64, found: bool) {return label.get_value_f64(key, label_to_check)}

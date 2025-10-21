@@ -97,7 +97,14 @@ get_value_int :: proc(key: string, label: KV_Label) -> (value: int, found: bool)
 	return conv.atoi(value_as_string), true
 }
 
-get_value_f32 :: proc(key: string, label: KV_Label) -> (value: f32) {return}
+get_value_f64 :: proc(key: string, label: KV_Label) -> (value: f64, found: bool) {
+	value_as_string: string
+	value_as_string, found = get_value_string(key, label)
+	if !found {
+		return 0, false
+	}
+	return conv.atof(value_as_string), true
+}
 
 @(private)
 label_request :: proc(pair: ^KV_Pair, key: string) {
