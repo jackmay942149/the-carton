@@ -58,4 +58,8 @@ opengl_update :: proc(scene: ^Scene) {
 		}
 	}
 
+	if scene.camera.update != nil {
+		scene.camera.update(&scene.camera)
+	}
+
 }

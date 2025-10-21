@@ -7,6 +7,7 @@ Camera :: struct {
 	look_at_position: [3]f32,
 	look_at_rotator:  [3]f32,
 	rotation_order:   Rotation_Order,
+	update:           proc(this: ^Camera),
 }
 
 @(private)
@@ -44,4 +45,8 @@ camera_get_view_matrix :: proc(camera: ^Camera) -> (view_matrix: matrix[4, 4]f32
 	view_matrix = la.matrix4_translate(camera.position) * view_matrix
 	view_matrix = la.matrix4_translate(camera.look_at_position) * view_matrix
 	return view_matrix
+}
+
+camera_get_forward_vec :: proc(camera: ^Camera) {
+	
 }
