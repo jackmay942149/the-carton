@@ -23,6 +23,10 @@ register_mesh_cstring :: proc(path: cstring) -> Mesh {
 	return mesh_register(path)
 }
 @(require_results)
+register_mesh_string :: proc(path: string) -> Mesh {
+	return mesh_register(path)
+}
+@(require_results)
 register_mesh_bytes :: proc(file: []u8) -> Mesh {
 	return mesh_register(file)
 }
@@ -30,6 +34,7 @@ register_mesh_bytes :: proc(file: []u8) -> Mesh {
 register_mesh :: proc {
 	register_mesh_bytes,
 	register_mesh_cstring,
+	register_mesh_string,
 }
 
 @(require_results)

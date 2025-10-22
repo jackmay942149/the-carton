@@ -5,6 +5,7 @@ import mem  "core:mem"
 import gl   "vendor:OpenGL"
 import la   "core:math/linalg"
 import fbx  "./dependencies/ufbx"
+import str  "core:strings"
 
 Mesh :: struct {
 	vertices: []Vertex,
@@ -67,6 +68,13 @@ mesh_register_runtime :: proc(path: cstring) -> (mesh: Mesh) {
 }
 
 @(private)
+mesh_register_runtime_string :: proc(path: string) -> (mesh: Mesh) {
+	cst := str.clone_to_cstring(path)
+	scene := open_scene_from_path(cst)
+	return process_scene(scene)
+}
+
+@(private)
 mesh_register_comptime :: proc(file: []u8) -> (mesh: Mesh) {
 	scene := open_scene_from_bytes(file)
 	return process_scene(scene)
@@ -76,6 +84,7 @@ mesh_register_comptime :: proc(file: []u8) -> (mesh: Mesh) {
 mesh_register :: proc{
 	mesh_register_comptime,
 	mesh_register_runtime,
+	mesh_register_runtime_string,
 }
 
 @(private = "file")

@@ -24,7 +24,6 @@ opengl_update :: proc(scene: ^Scene) {
 			entity.update(&entity)
 		}
 
-		
 		gl.UseProgram(entity.mesh.material.shader)
 		gl.BindTexture(gl.TEXTURE_2D, entity.mesh.material.texture)
 		gl.BindVertexArray(entity.mesh.vao)
