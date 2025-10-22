@@ -18,6 +18,7 @@ window_init :: proc(width, height: int, title: string, api: Graphics_Api, alloca
 	titlen := str.clone_to_cstring(title)
 	g_window_handle = glfw.CreateWindow(i32(width), i32(height), titlen, nil, nil)
 	glfw.MakeContextCurrent(g_window_handle)
+	glfw.SwapInterval(1)
 
 	g_graphics_api = api
 	#partial switch api {
