@@ -64,8 +64,25 @@ attach_texture_to_material :: proc(material: ^Material, texture_id: Texture) {
 	material_attach_texture(material, texture_id)
 }
 
+// Input
 is_key_down :: proc(key: Key) -> bool {
 	return input_is_key_down(key)
+}
+
+is_mouse_down :: proc(mb: Mouse_Button) -> bool {
+	return is_mouse_down(mb)
+}
+
+get_mouse_position :: proc() -> (x, y: f64) {
+	return input_mouse_position()
+}
+
+get_mouse_delta :: proc() -> (x, y: f64) {
+	return input_mouse_delta()
+}
+
+get_scroll_input :: proc() -> (x, y: f32) {
+	return input_get_scroll()
 }
 
 // the-label bindings

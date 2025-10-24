@@ -19,6 +19,7 @@ window_init :: proc(width, height: int, title: string, api: Graphics_Api, alloca
 	g_window_handle = glfw.CreateWindow(i32(width), i32(height), titlen, nil, nil)
 	glfw.MakeContextCurrent(g_window_handle)
 	glfw.SwapInterval(1)
+	glfw.SetScrollCallback(g_window_handle, input_scroll_callback)
 
 	g_graphics_api = api
 	#partial switch api {
@@ -42,7 +43,6 @@ window_should_close :: proc() -> bool {
 	return bool(glfw.WindowShouldClose(g_window_handle))
 }
 
-g_mouse_pos: [2]f64
 
 @(private)
 window_update :: proc(scene: ^Scene) {
@@ -52,13 +52,6 @@ window_update :: proc(scene: ^Scene) {
 	}
 	glfw.SwapBuffers(g_window_handle)
 	glfw.PollEvents()
-
-	mouse_pos_x, mouse_pos_y := input_mouse_motion()
-
-	if input_is_key_down(.LEFT_ALT) && input_is_mouse_down(.LEFT) {
-		scene.camera.look_at_rotator.y -= f32(g_mouse_pos.x - mouse_pos_x)/5
-		scene.camera.look_at_rotator.x -= f32(g_mouse_pos.y - mouse_pos_y)/5
-	}
-	g_mouse_pos = {mouse_pos_x, mouse_pos_y}
+	input_update_mouse_info()
 }
 

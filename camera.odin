@@ -60,7 +60,6 @@ camera_get_right_vec :: proc(camera: ^Camera) -> (right_vec: [3]f32) {
 	return la.normalize(la.cross(up, camera_get_directon(camera)))
 }
 
-@(private)
 camera_get_up_vec :: proc(camera: ^Camera) -> (up_vec: [3]f32) {
 	assert(camera != nil)
 	return la.cross(camera_get_directon(camera), camera_get_right_vec(camera))
