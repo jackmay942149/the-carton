@@ -49,4 +49,5 @@ Key :: enum {
 	RIGHT_ALT     = glfw.KEY_RIGHT_ALT,
 	RIGHT_SUPER   = glfw.KEY_RIGHT_SUPER,
 	MENU          = glfw.KEY_MENU,
+	ESCAPE        = glfw.KEY_ESCAPE,
 }

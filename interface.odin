@@ -2,6 +2,7 @@ package carton
 
 import label "./the-label"
 
+// Window
 init_window :: proc(width, height: int, title: string, api: Graphics_Api, allocator := context.allocator) {
 	window_init(width, height, title, api, allocator)
 }
@@ -14,10 +15,15 @@ update_window :: proc(scene: ^Scene) {
 	window_update(scene)
 }
 
+close_window :: proc() {
+	window_close()
+}
+
 destroy_window :: proc() {
 	window_destroy()
 }
 
+// Mesh
 @(require_results)
 register_mesh_cstring :: proc(path: cstring) -> Mesh {
 	return mesh_register(path)
@@ -37,6 +43,7 @@ register_mesh :: proc {
 	register_mesh_string,
 }
 
+// Materials
 @(require_results)
 register_shader :: proc(vert, frag: string) -> Shader {
 	return shader_register(vert, frag)
@@ -70,7 +77,7 @@ is_key_down :: proc(key: Key) -> bool {
 }
 
 is_mouse_down :: proc(mb: Mouse_Button) -> bool {
-	return is_mouse_down(mb)
+	return input_is_mouse_down(mb)
 }
 
 get_mouse_position :: proc() -> (x, y: f64) {

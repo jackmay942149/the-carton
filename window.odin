@@ -43,6 +43,11 @@ window_should_close :: proc() -> bool {
 	return bool(glfw.WindowShouldClose(g_window_handle))
 }
 
+@(private)
+window_close :: proc() {
+	glfw.SetWindowShouldClose(g_window_handle, true)
+}
+
 
 @(private)
 window_update :: proc(scene: ^Scene) {
