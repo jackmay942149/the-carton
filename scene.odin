@@ -51,6 +51,11 @@ scene_load_file :: proc(filepath: string) -> (scene: Scene_File) {
 	for entity, i in entity_array {
 		entity_json := entity.(json.Object)
 
+		scene_entities[i].name = entity_json["name"].(json.String)
+		scene_entities[i].position.x = f32(entity_json["position"].(json.Array)[0].(json.Float))
+		scene_entities[i].position.y = f32(entity_json["position"].(json.Array)[1].(json.Float))
+		scene_entities[i].position.z = f32(entity_json["position"].(json.Array)[2].(json.Float))
+		scene_entities[i].mesh.name = entity_json["mesh"].(json.Object)["name"].(json.String)
 		scene_entities[i].mesh.path = entity_json["mesh"].(json.Object)["path"].(json.String)
 		scene_entities[i].mesh.material.vert = entity_json["mesh"].(json.Object)["material"].(json.Object)["vert"].(json.String)
 		scene_entities[i].mesh.material.frag = entity_json["mesh"].(json.Object)["material"].(json.Object)["frag"].(json.String)
