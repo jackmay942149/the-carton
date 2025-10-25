@@ -92,6 +92,16 @@ get_scroll_input :: proc() -> (x, y: f32) {
 	return input_get_scroll()
 }
 
+// Project
+load_project_file :: proc(filepath: string) -> (project: Project_File) {
+	return project_load_file(filepath)
+}
+
+// Scene
+load_scene_file :: proc(filepath: string) -> (scene_description: Scene_File) {
+	return scene_load_file(filepath)
+}
+
 // the-label bindings
 update_label :: proc(path_label, path_key: string) {label.update_label(path_label, path_key)}
 load_label :: proc(path: string) -> label.KV_Label {return label.load_label(path)}
