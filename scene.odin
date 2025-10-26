@@ -20,6 +20,7 @@ Scene_File :: struct {
 Scene_File_Entity_Description :: struct {
 	name:     string,
 	position: [3]f32,
+	scale:    [3]f32,
 	mesh:     Scene_File_Mesh_Description,
 }
 
@@ -55,6 +56,9 @@ scene_load_file :: proc(filepath: string) -> (scene: Scene_File) {
 		scene_entities[i].position.x = f32(entity_json["position"].(json.Array)[0].(json.Float))
 		scene_entities[i].position.y = f32(entity_json["position"].(json.Array)[1].(json.Float))
 		scene_entities[i].position.z = f32(entity_json["position"].(json.Array)[2].(json.Float))
+		scene_entities[i].scale.x = f32(entity_json["scale"].(json.Array)[0].(json.Float))
+		scene_entities[i].scale.y = f32(entity_json["scale"].(json.Array)[1].(json.Float))
+		scene_entities[i].scale.z = f32(entity_json["scale"].(json.Array)[2].(json.Float))
 		scene_entities[i].mesh.name = entity_json["mesh"].(json.Object)["name"].(json.String)
 		scene_entities[i].mesh.path = entity_json["mesh"].(json.Object)["path"].(json.String)
 		scene_entities[i].mesh.material.vert = entity_json["mesh"].(json.Object)["material"].(json.Object)["vert"].(json.String)

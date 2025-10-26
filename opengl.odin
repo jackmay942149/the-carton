@@ -2,9 +2,9 @@ package carton
 
 import log  "core:log"
 import glfw "vendor:glfw"
+import str  "core:strings"
 import gl   "vendor:OpenGL"
 import la   "core:math/linalg"
-
 
 @(private)
 opengl_init :: proc() {
@@ -61,5 +61,11 @@ opengl_update :: proc(scene: ^Scene) {
 	if scene.camera.update != nil {
 		scene.camera.update(&scene.camera)
 	}
+}
 
+opengl_set_uniform_vec3 :: proc(uniform: string, value: [3]f32, shader_id: u32) {
+	gl.UseProgram(shader_id)
+	uni_cstr := str.clone_to_cstring(uniform) // CRINGE
+	uni := gl.GetUniformLocation(shader_id, uni_cstr)
+	gl.Uniform3f(uni, value.x, value.y, value.z)
 }
