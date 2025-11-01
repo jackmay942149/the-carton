@@ -10,7 +10,8 @@ shader_register :: proc(vert, frag: string) -> (shader_id: Shader) {
 	ok: bool
 	shader_id, ok = gl.load_shaders_file(vert, frag)
 	if !ok {
-		log.error("Failed to load shaders")
+		err_msg, type := gl.get_last_error_message()
+		log.error("Failed to load shaders", type, err_msg)
 	}
 	return shader_id
 }

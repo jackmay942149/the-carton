@@ -6,10 +6,11 @@ import glfw "vendor:glfw"
 import json "core:encoding/json"
 
 Scene :: struct {
-	window: glfw.WindowHandle,
-	camera: Camera,
+	window:   glfw.WindowHandle,
+	camera:   Camera,
 	entities: []Entity,
-	ui: UI,
+	ui:       UI,
+	lights:   []Light,
 }
 
 Scene_File :: struct {

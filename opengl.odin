@@ -5,6 +5,7 @@ import glfw "vendor:glfw"
 import str  "core:strings"
 import gl   "vendor:OpenGL"
 import la   "core:math/linalg"
+import fmt "core:fmt"
 
 @(private)
 opengl_init :: proc() {
@@ -44,9 +45,26 @@ opengl_update :: proc(scene: ^Scene) {
 
 		projection_mat := la.matrix4_perspective(f32(la.to_radians(45.0)), 1600.0/900.0, 0.1, 1000)
 
+		// Transform Matricies
 		gl.UniformMatrix4fv(model, 1, false, raw_data(&model_mat))
 		gl.UniformMatrix4fv(view, 1, false, raw_data(&view_mat))
 		gl.UniformMatrix4fv(projection, 1, false, raw_data(&projection_mat))
+
+		// Lights
+		for light, i in scene.lights {
+			uniform := fmt.caprint("uni_lights[", i, "].position", sep="")
+			location := gl.GetUniformLocation(entity.mesh.material.shader, uniform)
+			gl.Uniform3f(location, light.position.x, light.position.y, light.position.z)
+
+			uniform = fmt.caprint("uni_lights[", i, "].colour", sep="")
+			location = gl.GetUniformLocation(entity.mesh.material.shader, uniform)
+			gl.Uniform4f(location, light.colour.r, light.colour.g, light.colour.b, light.colour.a)
+		}
+
+		// Camera
+		location := gl.GetUniformLocation(entity.mesh.material.shader, "uni_camera_position")
+		gl.Uniform3f(location, scene.camera.position.x, scene.camera.position.y, scene.camera.position.z)
+
 		gl.DrawElements(gl.TRIANGLES, i32(len(entity.mesh.indices)), gl.UNSIGNED_INT, nil)
 	}
 
@@ -68,4 +86,11 @@ opengl_set_uniform_vec3 :: proc(uniform: string, value: [3]f32, shader_id: u32) 
 	uni_cstr := str.clone_to_cstring(uniform) // CRINGE
 	uni := gl.GetUniformLocation(shader_id, uni_cstr)
 	gl.Uniform3f(uni, value.x, value.y, value.z)
+}
+
+opengl_set_uniform_float :: proc(uniform: string, value: f32, shader_id: u32) {
+	gl.UseProgram(shader_id)
+	uni_cstr := str.clone_to_cstring(uniform) // CRINGE
+	uni := gl.GetUniformLocation(shader_id, uni_cstr)
+	gl.Uniform1f(uni, value)
 }
